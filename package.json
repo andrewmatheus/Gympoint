@@ -6,11 +6,13 @@
   "author": "Andrew Matheus <andrewmatheus@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "dev:init": "yarn sequelize db:migrate:undo:all; yarn sequelize db:migrate; yarn sequelize db:seed:all; yarn dev",
     "dev": "nodemon src/server.js",
     "dev:debug": "nodemon --inspect src/server.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "pg": "^7.12.1",
