@@ -10,17 +10,19 @@ import authMiddleware from './app/middleware/auth';
 const routes = new Router();
 
 routes.post('/sessions', SessionController.store);
-routes.post('/users', UserController.store);
 
 routes.use(authMiddleware);
+
+routes.post('/users', UserController.store);
+routes.put('/users/:id', UserController.update);
 
 routes.post('/students', StudentController.store);
 routes.put('/students/:id', StudentController.update);
 
 // Plan Management
-// routes.index('/planmanagement', PlanManagementController.index);
+routes.get('/plans', PlansController.index);
 routes.post('/plans', PlansController.store);
-// routes.put('/planmanagement/:id', PlanManagementController.update);
-// routes.delete('/planmanagement/:id', PlanManagementController.delete);
+routes.put('/plans/:id', PlansController.update);
+routes.delete('/plans/:id', PlansController.delete);
 
 export default routes;

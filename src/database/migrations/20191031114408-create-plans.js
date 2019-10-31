@@ -14,7 +14,6 @@ module.exports = {
       duration: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        unique: true,
       },
       price: {
         type: Sequelize.FLOAT,
