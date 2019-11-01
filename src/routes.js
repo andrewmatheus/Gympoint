@@ -5,6 +5,7 @@ import UserController from './app/controllers/UserController';
 import StudentController from './app/controllers/StudentController';
 import PlansController from './app/controllers/PlansController';
 import RegistrationsController from './app/controllers/RegistrationsController';
+import CheckinController from './app/controllers/CheckinController';
 
 import authMiddleware from './app/middleware/auth';
 
@@ -19,6 +20,10 @@ routes.put('/users/:id', UserController.update);
 
 routes.post('/students', StudentController.store);
 routes.put('/students/:id', StudentController.update);
+
+// Checkins
+routes.post('/students/:id/checkins', CheckinController.store);
+routes.get('/students/:id/checkins', CheckinController.index);
 
 // Plan Management
 routes.get('/plans', PlansController.index);
