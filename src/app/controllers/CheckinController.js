@@ -10,24 +10,15 @@ class CheckinController {
       return res.status(400).json({ error: 'Student is not exists.' });
     }
 
-    const studentId = student.id;
+    // const studentId = student.id;
 
-    const checkinRegister = await Checkin.findAll({
+    const checkinRegister = await Checkin.findOne({
       where: { student_id: student.id },
       order: ['created_at'],
     });
 
-    const checkinStudent = await Checkin.findOne({
-      where: { studentId, created_at: new Date() },
-    });
-
-    if (checkinStudent) {
-      return res.status(400).json({
-        error: 'Student checkin already registered on this date',
-      });
-    }
-
     if (checkinRegister) {
+      console.log(`Estou Aqui 1`);
       checkinRegister.forEach(async check => {
         const dateCheckin = check.created_at;
         const { Op } = Sequelize;
@@ -36,7 +27,7 @@ class CheckinController {
           const limitEndDate = addDays(dateCheckin, 7);
           const checkinBlock = await Checkin.findAll({
             where: {
-              created_at: { [Op.gte]: dateCheckin },
+              created_at: { [Op.gte]: blockStartDate },
               student_id: student.id,
             },
             attributes: [
@@ -46,6 +37,7 @@ class CheckinController {
             order: ['created_at'],
           });
 
+          console.log(`Estou Aqui 2`);
           if (checkinBlock.number_checkins === 5) {
             res.status(400).json({
               error: `Limit exceeded, allowed date for new chekin is ${limitEndDate}`,
@@ -60,7 +52,7 @@ class CheckinController {
     });
 
     return res.json(
-      `Chekin successfully performed! Student Credential: ${chekinFinal}`
+      `Chekin successfully performed! Student Credential: ${chekinFinal.student_id}`
     );
   }
 
