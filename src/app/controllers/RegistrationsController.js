@@ -5,6 +5,9 @@ import Student from '../models/Student';
 import Plan from '../models/Plan';
 import User from '../models/User';
 
+import RegistrationMail from '../jobs/RegistrationMail';
+import Queue from '../../lib/Queue';
+
 class RegistrationsController {
   async index(req, res) {
     const { page = 1 } = req.query;
@@ -93,6 +96,14 @@ class RegistrationsController {
       price,
     });
 
+    await Queue.add(RegistrationMail.key, {
+      studentExist,
+      planExist,
+      start_date,
+      end_date,
+      price,
+    });
+
     return res.json(registration);
   }
 
@@ -174,6 +185,17 @@ class RegistrationsController {
 
     if (!registration) {
       return res.status(400).json({ error: 'Registration not found' });
+    }
+
+    /**
+     * Check user is administrator
+     */
+    const user = await User.findByPk(req.userId);
+
+    if (!user.profile_admin) {
+      return res
+        .status(405)
+        .json({ error: 'Action allowed for administrators only!' });
     }
 
     await Registration.destroy({ where: { id: req.params.id } });
