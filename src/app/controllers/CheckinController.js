@@ -52,7 +52,25 @@ class CheckinController {
   }
 
   async index(req, res) {
-    return res.json();
+    const student = await Student.findByPk(req.params.id);
+    if (!student) {
+      return res.status(400).json({ error: 'Student is not exists.' });
+    }
+
+    const studentCheckins = await Checkin.findAll({
+      where: { student_id: req.params.id },
+      attributes: ['id', ['created_at', 'checkin_date']],
+      include: [
+        {
+          model: Student,
+          as: 'student',
+          attributes: ['id', 'name', 'age'],
+        },
+      ],
+      order: [['created_at', 'desc']],
+    });
+
+    return res.json(studentCheckins);
   }
 }
 
