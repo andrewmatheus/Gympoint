@@ -1,4 +1,4 @@
-import { subDays, addDays } from 'date-fns';
+import { subDays } from 'date-fns';
 import Sequelize from 'sequelize';
 import Checkin from '../models/Checkin';
 import Student from '../models/Student';
@@ -10,41 +10,36 @@ class CheckinController {
       return res.status(400).json({ error: 'Student is not exists.' });
     }
 
-    // const studentId = student.id;
-
-    const checkinRegister = await Checkin.findOne({
+    const lastCheckin = await Checkin.findOne({
       where: { student_id: student.id },
-      order: ['created_at'],
+      attributes: ['id', 'created_at'],
+      order: [['created_at', 'DESC']],
     });
 
-    if (checkinRegister) {
-      console.log(`Estou Aqui 1`);
-      checkinRegister.forEach(async check => {
-        const dateCheckin = check.created_at;
-        const { Op } = Sequelize;
-        const blockStartDate = subDays(new Date(), 7);
-        if (!(dateCheckin < blockStartDate)) {
-          const limitEndDate = addDays(dateCheckin, 7);
-          const checkinBlock = await Checkin.findAll({
-            where: {
-              created_at: { [Op.gte]: blockStartDate },
-              student_id: student.id,
-            },
-            attributes: [
-              [Sequelize.fn('COUNT', Sequelize.col('id'), 'number_checkins')],
-            ],
-            limit: 5,
-            order: ['created_at'],
-          });
+    if (lastCheckin) {
+      const {
+        dataValues: { created_at },
+      } = lastCheckin;
+      const dateCheckin = created_at;
+      const { Op } = Sequelize;
 
-          console.log(`Estou Aqui 2`);
-          if (checkinBlock.number_checkins === 5) {
-            res.status(400).json({
-              error: `Limit exceeded, allowed date for new chekin is ${limitEndDate}`,
-            });
-          }
+      const blockStartDate = subDays(new Date(), 7);
+
+      if (!(dateCheckin < blockStartDate)) {
+        const checkinBlock = await Checkin.findAndCountAll({
+          where: {
+            created_at: { [Op.gte]: blockStartDate },
+            student_id: student.id,
+          },
+          order: ['created_at'],
+        });
+
+        if (checkinBlock.count >= 5) {
+          return res.status(401).json({
+            error: 'Limit exceeded, You can only do 5 check-ins every 7 days',
+          });
         }
-      });
+      }
     }
 
     const chekinFinal = await Checkin.create({
