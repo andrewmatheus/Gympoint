@@ -6,6 +6,8 @@ import StudentController from './app/controllers/StudentController';
 import PlansController from './app/controllers/PlansController';
 import RegistrationsController from './app/controllers/RegistrationsController';
 import CheckinController from './app/controllers/CheckinController';
+import HelpOrdersController from './app/controllers/HelpOrdersController';
+import AnswerController from './app/controllers/AnswerController';
 
 import authMiddleware from './app/middleware/auth';
 
@@ -24,6 +26,16 @@ routes.put('/students/:id', StudentController.update);
 // Checkins
 routes.post('/students/:id/checkins', CheckinController.store);
 routes.get('/students/:id/checkins', CheckinController.index);
+
+// Help orders Student
+
+routes.post('/students/:id/help-orders', HelpOrdersController.store);
+routes.get('/students/:id/help-orders', HelpOrdersController.index);
+
+// Help orders answer
+
+routes.post('/help-orders/:id/help-answer', AnswerController.store);
+routes.get('/help-orders/:id/help-answer', AnswerController.index);
 
 // Plan Management
 routes.get('/plans', PlansController.index);
