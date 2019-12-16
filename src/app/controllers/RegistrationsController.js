@@ -16,11 +16,12 @@ class RegistrationsController {
       order: ['start_date'],
       attributes: [
         'id',
-        'active',
+        'daysBefore',
         'daysLeft',
         'start_date',
         'end_date',
         'price',
+        'active',
       ],
       limit: 20,
       offset: (page - 1) * 20,

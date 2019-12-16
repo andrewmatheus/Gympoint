@@ -1,7 +1,28 @@
 import * as Yup from 'yup';
+import Sequelize from 'sequelize';
 import User from '../models/User';
 
 class UserController {
+  async index(req, res) {
+    const { page = 1 } = req.query;
+    const { name = '' } = req.query;
+
+    const { Op } = Sequelize;
+
+    const query = `%${name}%`;
+
+    const users = await User.findAll({
+      where: {
+        name: { [Op.like]: query },
+      },
+      order: ['name'],
+      limit: 20,
+      offset: (page - 1) * 20,
+    });
+
+    return res.json(users);
+  }
+
   async store(req, res) {
     const schema = Yup.object().shape({
       name: Yup.string().required(),
